@@ -1,5 +1,5 @@
 {
-	"name" : "carlead/zoho-crm-copy-db",
+	"name" : "carlead/zoho-crm-copy-database",
 	"description" : "This package contains code to help you copy ZohoCRM records directly into your database.",
 	"type" : "library",
 	"license" : "MIT",
@@ -24,12 +24,12 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"Wabel\\Zoho\\CRM\\Copy\\" : "src"
+			"Carlead\\Zoho\\CRM\\Copy\\" : "src"
 		}
 	},
     "autoload-dev" : {
   	    "psr-4" : {
-		    "Wabel\\Zoho\\CRM\\Copy\\" : "tests"
+		    "Carlead\\Zoho\\CRM\\Copy\\" : "tests"
 	    }
     },
   	"minimum-stability": "dev",
