@@ -1,0 +1,8 @@
+.~
+vendor
+.buildpath
+.project
+composer.lock
+.settings/
+phpunit.xml
+build/
