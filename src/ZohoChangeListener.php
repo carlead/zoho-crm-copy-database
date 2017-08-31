@@ -2,7 +2,7 @@
 
 namespace Carlead\Zoho\CRM\Copy;
 
-use Wabel\Zoho\CRM\AbstractZohoDao;
+use Carlead\Zoho\CRM\AbstractZohoDao;
 
 /**
  * Interface used to catch changes in Zoho.

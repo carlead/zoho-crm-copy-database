@@ -5,7 +5,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaDiff;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Wabel\Zoho\CRM\AbstractZohoDao;
+use Carlead\Zoho\CRM\AbstractZohoDao;
 use function Stringy\create as s;
 /**
  * This class is in charge of synchronizing one table of your database with Zoho records.
@@ -181,7 +181,7 @@ class ZohoDatabaseCopier
      *
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Wabel\Zoho\CRM\Exception\ZohoCRMResponseException
+     * @throws \Carlead\Zoho\CRM\Exception\ZohoCRMResponseException
      */
     private function copyData(AbstractZohoDao $dao, $incrementalSync = true, $twoWaysSync = true)
     {

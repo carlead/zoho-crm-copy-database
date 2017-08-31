@@ -10,7 +10,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
-use Wabel\Zoho\CRM\AbstractZohoDao;
+use Carlead\Zoho\CRM\AbstractZohoDao;
 
 class ZohoCopyDatabaseCommand extends Command
 {
@@ -33,7 +33,7 @@ class ZohoCopyDatabaseCommand extends Command
 
     /**
      * @param ZohoDatabaseCopier                $zohoDatabaseCopier
-     * @param \Wabel\Zoho\CRM\AbstractZohoDao[] $zohoDaos           The list of Zoho DAOs to copy
+     * @param \Carlead\Zoho\CRM\AbstractZohoDao[] $zohoDaos           The list of Zoho DAOs to copy
      * @param Lock                              $lock               A lock that can be used to avoid running the same command twice at the same time
      */
     public function __construct(ZohoDatabaseCopier $zohoDatabaseCopier, array $zohoDaos, Lock $lock = null)
