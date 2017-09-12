@@ -163,9 +163,6 @@ class ZohoDatabaseCopier
             }
         }
         
-        /* add columns "Created Time" and "Modified Time" */
-        $table->addColumn('createdTime', 'datetime', ['notnull' => false]);
-        $table->addColumn('modifiedTime', 'datetime', ['notnull' => false]);
         $dbalTableDiffService = new DbalTableDiffService($this->connection, $this->logger);
         $hasChanges = $dbalTableDiffService->createOrUpdateTable($table);
         if ($twoWaysSync && $hasChanges) {
@@ -244,15 +241,14 @@ class ZohoDatabaseCopier
                 $this->logger->debug("Updating record with ID '".$record->getZohoId()."'.");
                 $identifier = ['id' => $record->getZohoId()];
                 $types['id'] = 'string';
-                $identifier['createdTime'] = $record->getCreatedTime();
+                $data['createdTime'] = $record->getCreatedTime();
                 $types['createdTime'] = 'datetime';
-                $identifier['modifiedTime'] = $record->getModifiedTime();
+                $data['modifiedTime'] = $record->getModifiedTime();
                 $types['modifiedTime'] = 'datetime';
                 $this->connection->update($tableName, $data, $identifier, $types);
                 // Let's add the id for the update trigger
                 $data['id'] = $record->getZohoId();
-                $data['createdTime'] = $record->getCreatedTime();
-                $data['modifiedTime'] = $record->getModifiedTime();
+                
                 foreach ($this->listeners as $listener) {
                     $listener->onUpdate($data, $result, $dao);
                 }
