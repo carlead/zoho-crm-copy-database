@@ -12,7 +12,7 @@
 	],
 	"require" : {
 		"php" : ">=5.6",
-		"carlead/zoho-crm-orm-bd": "master",
+		"carlead/zoho-crm-orm-bd": "dev-master",
 		"doctrine/dbal": "~2.5",
 		"symfony/console": "~2.0 | ~3.0",
 		"mouf/utils.common.lock": "~1.0",
