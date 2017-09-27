@@ -141,6 +141,7 @@ class ZohoDatabaseCopier
                 case 'Percent':
                     $type = 'float';
                     break;
+                case 'AutoNumber':
                 case 'Integer':
                     $type = 'integer';
                     break;
@@ -283,6 +284,7 @@ class ZohoDatabaseCopier
     private function getTableName(AbstractZohoDao $dao)
     {
         $tableName = $this->prefix.$dao->getPluralModuleName();
+        $tableName = str_replace("/", "", $tableName);
         $tableName = s($tableName)->upperCamelize()->underscored();
         return (string) $tableName;
     }
