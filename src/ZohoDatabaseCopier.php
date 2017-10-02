@@ -220,9 +220,9 @@ class ZohoDatabaseCopier
         $select = $this->connection->prepare('SELECT * FROM '.$tableName.' WHERE id = :id');
         $this->connection->beginTransaction();
         foreach ($records as $record) {
-            /* on supprime le record du tableau qui vont etre supprimé */
+            /* on supprime le vendeur du tableau des users qui vont etre supprimé */
             if (in_array($record->getZohoId(), $array_data_delete)) {
-                /* si il sont déjà présent alors on l'enlève du tableau car après on supprime les restants */
+                /* si il sont déjà présent alors on l'enlève du tableau car après on supprimer les restants */
                 $key = array_search($record->getZohoId(), $array_data_delete);
                 unset($array_data_delete[$key]);
             }
@@ -272,9 +272,13 @@ class ZohoDatabaseCopier
                 }
             }
         }
-        /* on supprime les vendeurs plus présent */
+        /* on supprime les vendeurs qui ne sont plus présent en testant qu'il existe bien dans la BDD */
         foreach ($array_data_delete as $id_data_delete) {
-            $this->connection->delete($tableName, [ 'id' => $id_data_delete ]);
+            $select->execute(['id' => $id_data_delete]);
+            $result = $select->fetch(\PDO::FETCH_ASSOC);
+            if ($result === true) {
+                $this->connection->delete($tableName, [ 'id' => $id_data_delete ]);
+            }
         }
         foreach ($deletedRecordIds as $id) {
             $this->connection->delete($tableName, [ 'id' => $id ]);
