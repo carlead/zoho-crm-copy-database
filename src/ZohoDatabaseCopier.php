@@ -276,7 +276,7 @@ class ZohoDatabaseCopier
         foreach ($array_data_delete as $id_data_delete) {
             $select->execute(['id' => $id_data_delete]);
             $result = $select->fetch(\PDO::FETCH_ASSOC);
-            if ($result === true) {
+            if ($result !== false) {
                 $this->connection->delete($tableName, [ 'id' => $id_data_delete ]);
             }
         }
