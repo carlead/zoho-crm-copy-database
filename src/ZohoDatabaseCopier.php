@@ -183,6 +183,7 @@ class ZohoDatabaseCopier
      */
     private function copyData(AbstractZohoDao $dao, $incrementalSync = true, $twoWaysSync = true)
     {
+        $array_data_delete = array();
         $tableName = $this->getTableName($dao);
         if ($incrementalSync) {
             $this->logger->info("Copying incremental data for '$tableName'");
@@ -208,9 +209,24 @@ class ZohoDatabaseCopier
         foreach ($flatFields as $field) {
             $fieldsByName[$field['name']] = $field;
         }
+        
+        /* select records in bdd for delete after if doesn't exist anymore */
+        $select_delete = $this->connection->query('SELECT * FROM '.$tableName);
+        $records_delete = $select_delete->fetchAll();
+        foreach($records_delete as $record_delete){
+            $array_data_delete[$record_delete['id']] = $record_delete['id'];
+        }
+        
         $select = $this->connection->prepare('SELECT * FROM '.$tableName.' WHERE id = :id');
         $this->connection->beginTransaction();
         foreach ($records as $record) {
+            /* on supprime le record du tableau qui vont etre supprimé */
+            if (in_array($record->getZohoId(), $array_data_delete)) {
+                /* si il sont déjà présent alors on l'enlève du tableau car après on supprime les restants */
+                $key = array_search($record->getZohoId(), $array_data_delete);
+                unset($array_data_delete[$key]);
+            }
+            
             $data = [];
             $types = [];
             foreach ($table->getColumns() as $column) {
@@ -238,6 +254,7 @@ class ZohoDatabaseCopier
                 foreach ($this->listeners as $listener) {
                     $listener->onInsert($data, $dao);
                 }
+                
             } else {
                 $this->logger->debug("Updating record with ID '".$record->getZohoId()."'.");
                 $identifier = ['id' => $record->getZohoId()];
@@ -254,6 +271,10 @@ class ZohoDatabaseCopier
                     $listener->onUpdate($data, $result, $dao);
                 }
             }
+        }
+        /* on supprime les vendeurs plus présent */
+        foreach ($array_data_delete as $id_data_delete) {
+            $this->connection->delete($tableName, [ 'id' => $id_data_delete ]);
         }
         foreach ($deletedRecordIds as $id) {
             $this->connection->delete($tableName, [ 'id' => $id ]);
