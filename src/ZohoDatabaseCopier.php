@@ -183,7 +183,6 @@ class ZohoDatabaseCopier
      */
     private function copyData(AbstractZohoDao $dao, $incrementalSync = true, $twoWaysSync = true)
     {
-        $array_data_delete = array();
         $tableName = $this->getTableName($dao);
         if ($incrementalSync) {
             $this->logger->info("Copying incremental data for '$tableName'");
@@ -202,29 +201,30 @@ class ZohoDatabaseCopier
             $records = $dao->getRecords();
             $deletedRecordIds = [];
         }
+        
         $this->logger->info("Fetched ".count($records)." records");
         $table = $this->connection->getSchemaManager()->createSchema()->getTable($tableName);
         $flatFields = $this->getFlatFields($dao->getFields());
         $fieldsByName = [];
         foreach ($flatFields as $field) {
             $fieldsByName[$field['name']] = $field;
-        }
+        }        
         
         /* select records in bdd for delete after if doesn't exist anymore */
         $select_delete = $this->connection->query('SELECT * FROM '.$tableName);
         $records_delete = $select_delete->fetchAll();
         foreach($records_delete as $record_delete){
-            $array_data_delete[$record_delete['id']] = $record_delete['id'];
+            $deletedRecordIds[$record_delete['id']] = $record_delete['id'];
         }
         
         $select = $this->connection->prepare('SELECT * FROM '.$tableName.' WHERE id = :id');
         $this->connection->beginTransaction();
         foreach ($records as $record) {
             /* on supprime le vendeur du tableau des users qui vont etre supprimé */
-            if (in_array($record->getZohoId(), $array_data_delete)) {
+            if (in_array($record->getZohoId(), $deletedRecordIds)) {
                 /* si il sont déjà présent alors on l'enlève du tableau car après on supprimer les restants */
-                $key = array_search($record->getZohoId(), $array_data_delete);
-                unset($array_data_delete[$key]);
+                $key = array_search($record->getZohoId(), $deletedRecordIds);
+                unset($deletedRecordIds[$key]);
             }
             
             $data = [];
@@ -240,6 +240,7 @@ class ZohoDatabaseCopier
                     $types[$nameColumn] = $column->getType()->getName();
                 }
             }
+            
             $select->execute(['id' => $record->getZohoId()]);
             $result = $select->fetch(\PDO::FETCH_ASSOC);
             if ($result === false) {
@@ -272,22 +273,15 @@ class ZohoDatabaseCopier
                 }
             }
         }
-        /* on supprime les vendeurs qui ne sont plus présent en testant qu'il existe bien dans la BDD */
-        foreach ($array_data_delete as $id_data_delete) {
-            $select->execute(['id' => $id_data_delete]);
-            $result = $select->fetch(\PDO::FETCH_ASSOC);
-            if ($result !== false) {
-                $this->connection->delete($tableName, [ 'id' => $id_data_delete ]);
-            }
-        }
+        
         foreach ($deletedRecordIds as $id) {
-            $this->connection->delete($tableName, [ 'id' => $id ]);
             if ($twoWaysSync) {
                 // TODO: we could detect if there are changes to be updated to the server and try to warn with a log message
                 // Also, let's remove the newly created field (because of the trigger) to avoid looping back to Zoho
                 $this->connection->delete('local_delete', [ 'table_name' => $tableName, 'id' => $id ]);
                 $this->connection->delete('local_update', [ 'table_name' => $tableName, 'id' => $id ]);
             }
+            $this->connection->delete($tableName, [ 'id' => $id ]);
         }
         $this->connection->commit();
     }
