@@ -251,6 +251,35 @@ class ZohoDatabaseCopier
                 $types['createdTime'] = 'datetime';
                 $data['modifiedTime'] = $record->getModifiedTime();
                 $types['modifiedTime'] = 'datetime';
+
+                switch ($tableName) {
+                    case 'leads':
+                        $result = $this->connection->fetchAssoc('SELECT id FROM concessionnaires WHERE customModule2Name = ?', array($record->getOrigineConcessionnaire()));
+                        $data['origineConcessionnaireID'] = $result['id'];
+                        $types['origineConcessionnaireID'] = 'string';
+
+                        $result = $this->connection->fetchAssoc('SELECT id FROM vendeurs WHERE vendorName = ?', array($record->getVendeurs()));
+                        $data['vendeursID'] = $result['id'];
+                        $types['vendeursID'] = 'string';
+                        break;
+                    case 'vendeurs':
+                        $result = $this->connection->fetchAssoc('SELECT id FROM concessionnaires WHERE customModule2Name = ?', array($record->getOrigineConcessionnaire()));
+                        $data['origineConcessionnaireID'] = $result['id'];
+                        $types['origineConcessionnaireID'] = 'string';
+
+                        break;
+                    case 'vendeurs_concessionnaires':
+                        $result = $this->connection->fetchAssoc('SELECT id FROM concessionnaires WHERE customModule2Name = ?', array($record->getChoixConcessionnaire()));
+                        $data['choixConcessionnaireID'] = $result['id'];
+                        $types['choixConcessionnaireID'] = 'string';
+
+                        $result = $this->connection->fetchAssoc('SELECT id FROM vendeurs WHERE vendorName = ?', array($record->getChoixVendeur()));
+                        $data['choixVendeurID'] = $result['id'];
+                        $types['choixVendeurID'] = 'string';
+
+                        break;
+                }
+                
                 $this->connection->insert($tableName, $data, $types);
                 foreach ($this->listeners as $listener) {
                     $listener->onInsert($data, $dao);
@@ -264,6 +293,35 @@ class ZohoDatabaseCopier
                 $types['createdTime'] = 'datetime';
                 $data['modifiedTime'] = $record->getModifiedTime();
                 $types['modifiedTime'] = 'datetime';
+
+                switch ($tableName) {
+                    case 'leads':
+                        $result = $this->connection->fetchAssoc('SELECT id FROM concessionnaires WHERE customModule2Name = ?', array($record->getOrigineConcessionnaire()));
+                        $data['origineConcessionnaireID'] = $result['id'];
+                        $types['origineConcessionnaireID'] = 'string';
+
+                        $result = $this->connection->fetchAssoc('SELECT id FROM vendeurs WHERE vendorName = ?', array($record->getVendeurs()));
+                        $data['vendeursID'] = $result['id'];
+                        $types['vendeursID'] = 'string';
+                        break;
+                    case 'vendeurs':
+                        $result = $this->connection->fetchAssoc('SELECT id FROM concessionnaires WHERE customModule2Name = ?', array($record->getOrigineConcessionnaire()));
+                        $data['origineConcessionnaireID'] = $result['id'];
+                        $types['origineConcessionnaireID'] = 'string';
+
+                        break;
+                    case 'vendeurs_concessionnaires':
+                        $result = $this->connection->fetchAssoc('SELECT id FROM concessionnaires WHERE customModule2Name = ?', array($record->getChoixConcessionnaire()));
+                        $data['choixConcessionnaireID'] = $result['id'];
+                        $types['choixConcessionnaireID'] = 'string';
+
+                        $result = $this->connection->fetchAssoc('SELECT id FROM vendeurs WHERE vendorName = ?', array($record->getChoixVendeur()));
+                        $data['choixVendeurID'] = $result['id'];
+                        $types['choixVendeurID'] = 'string';
+
+                        break;
+                }
+
                 $this->connection->update($tableName, $data, $identifier, $types);
                 // Let's add the id for the update trigger
                 $data['id'] = $record->getZohoId();
